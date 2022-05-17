@@ -74,13 +74,13 @@ Checkout from the git client plugin source repository using https protocol, no c
 [source,groovy]
 ---
 checkout([$class: 'GitSCM',
-          branches: [[name: 'stable-2.x']], 
+          branches: [[name: 'stable-2.x']],
           userRemoteConfigs: [[url: 'https://github.com/jenkinsci/git-client-plugin.git']]])
 ---
 
 ==== Checkout with ssh and a private key credential
 
-Checkout from the git client plugin source repository using ssh protocol, ssh private credentials, and a non-default branch. 
+Checkout from the git client plugin source repository using ssh protocol, ssh private credentials, and a non-default branch.
 The git plugin supports private key credentials provided by the link:https://plugins.jenkins.io/credentials[Jenkins credentials plugin].
 
 [source,groovy]
@@ -114,7 +114,6 @@ checkout([$class: 'GitSCM',
           extensions: [[$class: 'GitLFSPull']],
           userRemoteConfigs: [[url: 'https://github.com/jenkinsci/git-client-plugin.git']]])
 ---
-
 
 ==== Checkout without fetching tags (advanced clone behavior)
 
