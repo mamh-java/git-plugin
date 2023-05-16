@@ -10,6 +10,7 @@ import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.Messages;
 import hudson.plugins.git.extensions.GitSCMExtension;
 import hudson.plugins.git.extensions.GitSCMExtensionDescriptor;
+import hudson.slaves.WorkspaceList;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
@@ -23,22 +24,42 @@ import java.io.IOException;
  */
 public class RelativeTargetDirectory extends GitSCMExtension {
     private String relativeTargetDir;
+    private boolean relativeToTmp;
 
     @DataBoundConstructor
+    public RelativeTargetDirectory(String relativeTargetDir, boolean relativeToTmp) {
+        this.relativeTargetDir = relativeTargetDir;
+        this.relativeToTmp = relativeToTmp;
+    }
+
     public RelativeTargetDirectory(String relativeTargetDir) {
         this.relativeTargetDir = relativeTargetDir;
+        this.relativeToTmp = false;
     }
 
     public String getRelativeTargetDir() {
         return relativeTargetDir;
     }
 
+    public boolean isRelativeToTmp() {
+        return relativeToTmp;
+    }
+
     @Override
     public FilePath getWorkingDirectory(GitSCM scm, Job<?, ?> context, FilePath workspace, EnvVars environment, TaskListener listener) throws IOException, InterruptedException, GitException {
-        if (relativeTargetDir == null || relativeTargetDir.length() == 0 || relativeTargetDir.equals(".")) {
-            return workspace;
+        FilePath ws = workspace;
+        if (relativeToTmp) {
+            ws = WorkspaceList.tempDir(workspace);
         }
-        return workspace.child(environment.expand(relativeTargetDir));
+
+        if (relativeTargetDir == null || relativeTargetDir.length() == 0 || relativeTargetDir.equals(".")) {
+            return ws;
+        }
+        // JENKINS-10880: workspace can be null
+        if (ws == null) {
+            return null;
+        }
+        return ws.child(environment.expand(relativeTargetDir));
     }
 
     @Extension
